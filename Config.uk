@@ -1,0 +1,6 @@
+menuconfig LIBUNWIND
+    bool "libunwind - unwinder"
+	select LIBNOLIBC if !HAVE_LIBC
+	select LIBCOMPILER_RT
+	depends on !PLAT_LINUXU
+    default n
