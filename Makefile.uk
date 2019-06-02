@@ -75,10 +75,14 @@ CXXINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/include
 ################################################################################
 CONFIG_FLAGS   += -D _LIBUNWIND_HAS_NO_THREADS  -D __ELF__  -D _LIBUNWIND_IS_NATIVE_ONLY		\
 		  -D _LIBUNWIND_SUPPORT_DWARF_UNWIND -D _LIBUNWIND_IS_BAREMETAL				\
-		  -D _LIBUNWIND_BUILD_ZERO_COST_APIS -D _LIBUNWIND_TARGET_X86_64 -D __x86_64__
+		  -D _LIBUNWIND_TARGET_X86_64 -D __x86_64__
 
 LIBUNWIND_CFLAGS-y      +=  $(CONFIG_FLAGS)
 LIBUNWIND_CXXFLAGS-y    +=  $(CONFIG_FLAGS)
+
+SUPPRESS_FLAGS += -Wno-unused-parameter
+LIBUNWIND_CFLAGS-y   += $(SUPPRESS_FLAGS)
+LIBUNWIND_CXXFLAGS-y += $(SUPPRESS_FLAGS)
 
 ################################################################################
 # Library sources
