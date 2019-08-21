@@ -65,10 +65,11 @@ LIBUNWIND_SRC=$(LIBUNWIND_ORIGIN)/$(LIBUNWIND_SUBDIR)
 ################################################################################
 # Library includes
 ################################################################################
-CINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/src
 CINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/include
-CXXINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/src
 CXXINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/include
+
+LIBUNWIND_CINCLUDES-y   += -I$(LIBUNWIND_SRC)/src
+LIBUNWIND_CXXINCLUDES-y += -I$(LIBUNWIND_SRC)/src
 
 ################################################################################
 # Global flags
