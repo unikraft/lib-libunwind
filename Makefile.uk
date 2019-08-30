@@ -42,9 +42,6 @@ ifeq ($(CONFIG_LIBUNWIND),y)
 ifneq ($(CONFIG_LIBCOMPILER_RT),y)
 $(error Require libcompiler_rt)
 endif
-ifeq ($(CONFIG_PLAT_LINUXU), y)
-$(error Libunwind not supported on Linuxu)
-endif
 endif
 
 ################################################################################
