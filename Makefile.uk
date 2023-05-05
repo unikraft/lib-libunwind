@@ -1,8 +1,11 @@
 #  libunwind Makefile.uk
 #
 #  Authors: Vlad-Andrei Badoiu <vlad_andrei.badoiu@stud.acs.upb.ro>
+#           Marco Schlumpp <marco@unikraft.io>
+#           Andrei Tatar <andrei@unikraft.io>
 #
 #  Copyright (c) 2019, Politehnica University of Bucharest. All rights reserved.
+#  Copyright (c) 2023, Unikraft GmbH and The Unikraft Authors.
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -45,8 +48,8 @@ endif
 ################################################################################
 # Sources
 ################################################################################
-LIBUNWIND_VERSION=7.0.0
-LIBUNWIND_URL=http://releases.llvm.org/$(LIBUNWIND_VERSION)/libunwind-$(LIBUNWIND_VERSION).src.tar.xz
+LIBUNWIND_VERSION=14.0.6
+LIBUNWIND_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LIBUNWIND_VERSION)/libunwind-$(LIBUNWIND_VERSION).src.tar.xz
 LIBUNWIND_PATCHDIR=$(LIBUNWIND_BASE)/patches
 $(eval $(call fetch,libunwind,$(LIBUNWIND_URL)))
 $(eval $(call patch,libunwind,$(LIBUNWIND_PATCHDIR),libunwind-$(LIBUNWIND_VERSION).src))
@@ -54,8 +57,7 @@ $(eval $(call patch,libunwind,$(LIBUNWIND_PATCHDIR),libunwind-$(LIBUNWIND_VERSIO
 ################################################################################
 # Helpers
 ################################################################################
-LIBUNWIND_SUBDIR=libunwind-$(LIBUNWIND_VERSION).src
-LIBUNWIND_SRC=$(LIBUNWIND_ORIGIN)/$(LIBUNWIND_SUBDIR)
+LIBUNWIND_SRC=$(LIBUNWIND_ORIGIN)/libunwind-$(LIBUNWIND_VERSION).src
 
 ################################################################################
 # Library includes
@@ -63,29 +65,36 @@ LIBUNWIND_SRC=$(LIBUNWIND_ORIGIN)/$(LIBUNWIND_SUBDIR)
 CINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/include
 CXXINCLUDES-$(CONFIG_LIBUNWIND) += -I$(LIBUNWIND_SRC)/include
 
-LIBUNWIND_CINCLUDES-y   += -I$(LIBUNWIND_SRC)/src
-LIBUNWIND_CXXINCLUDES-y += -I$(LIBUNWIND_SRC)/src
-
 ################################################################################
 # Global flags
 ################################################################################
-CONFIG_FLAGS   += -D _LIBUNWIND_HAS_NO_THREADS  -D __ELF__  -D _LIBUNWIND_IS_NATIVE_ONLY		\
-		  -D _LIBUNWIND_SUPPORT_DWARF_UNWIND -D _LIBUNWIND_IS_BAREMETAL
+LIBUNWIND_FLAGS-y += -DNDEBUG
+LIBUNWIND_FLAGS-y += -Wall
+LIBUNWIND_FLAGS-y += -Wsign-compare
+LIBUNWIND_FLAGS-y += -D_LIBUNWIND_IS_BAREMETAL
+LIBUNWIND_FLAGS-y += -D_LIBUNWIND_IS_NATIVE_ONLY
+LIBUNWIND_FLAGS-y += -D_LIBUNWIND_HAS_NO_THREADS
 
-LIBUNWIND_CFLAGS-y      +=  $(CONFIG_FLAGS)
-LIBUNWIND_CXXFLAGS-y    +=  $(CONFIG_FLAGS)
+LIBUNWIND_CFLAGS-y += $(LIBUNWIND_FLAGS-y)
 
-LIBUNWIND_SUPPRESS_FLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
-LIBUNWIND_CFLAGS-y   += $(LIBUNWIND_SUPPRESS_FLAGS)
-LIBUNWIND_CXXFLAGS-y += $(LIBUNWIND_SUPPRESS_FLAGS)
+LIBUNWIND_CXXFLAGS-y += $(LIBUNWIND_FLAGS-y)
+LIBUNWIND_CXXFLAGS-y += -fno-rtti -fno-exceptions
+
+LIBUNWIND_ASFLAGS-y += -D__linux__
 
 ################################################################################
 # Library sources
 ################################################################################
-LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindLevel1.c
-LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/Unwind-sjlj.c
-LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindLevel1-gcc-ext.c
+# C++ sources
 LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/libunwind.cpp
 LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/Unwind-EHABI.cpp
+LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/Unwind-seh.cpp
+
+# C sources
+LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindLevel1.c
+LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindLevel1-gcc-ext.c
+LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/Unwind-sjlj.c
+
+# Assembly
 LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindRegistersRestore.S
 LIBUNWIND_SRCS-y += $(LIBUNWIND_SRC)/src/UnwindRegistersSave.S
