@@ -48,7 +48,7 @@ endif
 ################################################################################
 # Sources
 ################################################################################
-LIBUNWIND_VERSION=14.0.6
+LIBUNWIND_VERSION=15.0.0
 LIBUNWIND_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LIBUNWIND_VERSION)/libunwind-$(LIBUNWIND_VERSION).src.tar.xz
 LIBUNWIND_PATCHDIR=$(LIBUNWIND_BASE)/patches
 $(eval $(call fetch,libunwind,$(LIBUNWIND_URL)))
